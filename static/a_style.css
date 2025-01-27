@@ -1,0 +1,142 @@
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('ii.jpg');
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    opacity: 0.9;
+}
+.text {
+    position: fixed; 
+    top: 0;          
+    left: 0;
+    right: 0;
+    background-color: #007bff; 
+    color: white; 
+    text-align: center; 
+    padding: 15px;
+    z-index: 1000; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    font-size: 18px;
+    font-weight: bold;
+}
+/* Container Styling */
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Row Styling */
+.row {
+    margin-top: 20px;
+    justify-content: center;
+}
+.logout-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    border: 2px solid rgb(200, 200, 200);
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    background-color: #fff;
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: auto;
+}
+label {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: auto; 
+    
+}
+
+.logout-btn {
+    width: 200px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #0d6efd;
+    transition: all 0.3s ease;
+}
+
+
+/* Card Styling */
+.p-3 {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-radius: 8px;
+    padding: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.p-3:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Link Styling */
+.p-3 a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.p-3 a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .row {
+        row-gap: 10px; /* Adjust spacing for smaller screens */
+    }
+
+    .p-3 {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
