@@ -11,13 +11,13 @@
     <body>
         <div class="box">
             <h1>Forgot Password</h1>
-            <form action="forgot" method="post">
+            <form action="{{url_for('forgot_password')}}" method="post">
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email" required>
                 <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Send Reset Link</button>     
             </form>
             <div>
-                <a href="login.html" style="text-decoration: none;">Login</a>
+                <a href={{ url_for('login')}} style="text-decoration: none;">Login</a>
             </div>
         </div>
     </body>

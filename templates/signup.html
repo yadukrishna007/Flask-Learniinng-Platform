@@ -11,16 +11,18 @@
     <body>
         <div class="box">
             <h1>Signup</h1>
-            <form action="Signup" method="post">
+            <form action="{{url_for('sign_up')}}" method="post">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required>
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email" required>
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" required>
+                <label for="password">Confirm Password:</label>
+                <input type="password" name="cpassword" id="cpassword" required>
                 <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Login</button>     
                 <div style="text-align: center;">
-                    <a href="login.html" style="text-decoration: none;">Already have an account?</a>
+                    <a href={{ url_for('login')}} style="text-decoration: none;">Already have an account?</a>
                 </div>
             </form>
         </div>

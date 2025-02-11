@@ -10,12 +10,12 @@
     </head>
     <body>
         <div class="box">
-            <form action="getuser" method="post">
+            <form action="{{url_for('get_user')}}" method="post">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required>
                 <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Get User</button>
             </form>
-            <form action="edituser" method="post">
+            <form action="{{url_for('update_user')}}" method="post">
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email" required>
                 <label for="username">Username:</label>

@@ -14,8 +14,8 @@
                 <tr>
                     <th>Course ID</th>
                     <th>Course Name</th>
-                    <th>Tutor</th>
-                    <th>Course Material</th>
+                    <th>Tutor id</th>
+                    <th>Course Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,10 +24,8 @@
                 <tr>
                     <td>{{ course.id }}</td>
                     <td>{{ course.name }}</td>
-                    <td>{{ course.tutor }}</td>
-                    <td>
-                        <a href="{{ course.pdf_url }}" class="btn btn-info btn-sm" target="_blank">Download PDF</a>
-                    </td>
+                    <td>{{ course.tutor_id }}</td>
+                    <td>{{ course.description }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

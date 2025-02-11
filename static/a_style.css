@@ -1,42 +1,52 @@
 /* General Body Styling */
 body {
-    font-family: Arial, sans-serif;
-    background-image: url('ii.jpg');
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #eef2f3, #dfe9f3);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    opacity: 0.9;
 }
+
+/* Fixed Header */
 .text {
     position: fixed; 
     top: 0;          
     left: 0;
     right: 0;
-    background-color: #007bff; 
-    color: white; 
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
     text-align: center; 
     padding: 15px;
     z-index: 1000; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-    font-size: 18px;
-    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    font-weight: 600;
 }
-/* Container Styling */
+
+/* Main Container */
 .container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
 }
 
 /* Row Styling */
 .row {
-    margin-top: 20px;
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 15px;
 }
+
+/* Logout Button Container */
 .logout-container {
     position: fixed;
     bottom: 20px;
@@ -46,83 +56,112 @@ body {
     display: flex;
     justify-content: center;
 }
+
+/* Box Styling */
 .box {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     position: relative;
-    border: 2px solid rgb(200, 200, 200);
+    border: 2px solid #d1d1d1;
     padding: 30px;
     width: 90%;
     max-width: 500px;
-    background-color: #fff;
+    background: #fff;
     margin: 20px auto;
     border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    height: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
 }
+
+.box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Form Inputs */
 label {
-    margin-top: 10px;
-    font-size: 16px;
+    margin-top: 12px;
+    font-size: 17px;
+    font-weight: 500;
 }
 
 input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-top: 5px;
     margin-bottom: 15px; 
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 16px;
+    transition: border 0.3s ease;
 }
 
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Buttons */
 button {
     margin: 5px;
-    padding: 10px 20px;
-    background-color: #28a745;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #28a745, #218838);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
-    width: auto; 
-    
-}
-
-.logout-btn {
-    width: 200px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border: 2px solid #0d6efd;
-    border-radius: 8px;
-    background-color: transparent;
-    color: #0d6efd;
     transition: all 0.3s ease;
 }
 
+button:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-2px);
+}
+
+/* Logout Button */
+.logout-btn {
+    width: 200px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    background: transparent;
+    color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #007bff;
+    color: white;
+}
 
 /* Card Styling */
 .p-3 {
-    background-color: #007bff; /* Bootstrap primary color */
+    background: linear-gradient(135deg, #007bff, #0056b3);
     border-radius: 8px;
-    padding: 15px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .p-3:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 }
 
-/* Link Styling */
+/* Links */
 .p-3 a {
     text-decoration: none;
     color: white;
     font-weight: bold;
     font-size: 18px;
+    transition: color 0.3s ease;
 }
 
 .p-3 a:hover {
@@ -132,11 +171,19 @@ button {
 /* Responsive Styling */
 @media (max-width: 768px) {
     .row {
-        row-gap: 10px; /* Adjust spacing for smaller screens */
+        row-gap: 12px;
     }
 
     .p-3 {
         font-size: 16px;
-        padding: 12px;
+        padding: 14px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .box {
+        padding: 25px;
     }
 }

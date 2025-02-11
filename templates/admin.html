@@ -15,23 +15,23 @@
         <div class="container text-center">
             <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
               <div class="col">
-                <div class="p-3"><a href="adduser.html">Add Users</a></div>
+                <div class="p-3"><a href={{ url_for('adduser')}}>Add Users</a></div>
               </div>
               <div class="col">
-                <div class="p-3"><a href="edituser.html">Edit Users</a>
+                <div class="p-3"><a href={{ url_for('edituser')}}>Edit Users</a>
                 </div>
               </div>
               <div class="col">
-                <div class="p-3"><a href="deleteuser.html">Delete Users</a></div>
+                <div class="p-3"><a href={{url_for('deleteuser')}}>Delete Users</a></div>
               </div>
               <div class="col">
-                <div class="p-3"><a href="viewuser.html">View Users</a></div>
+                <div class="p-3"><a href={{url_for('viewuser')}}>View Users</a></div>
               </div>
               <div class="col">
-                <div class="p-3"><a href="viewcourse.html">View Courses</a></div>
+                <div class="p-3"><a href={{url_for('viewcourse')}}>View Courses</a></div>
               </div>
               <div class="col">
-                <div class="p-3"><a href="viewresource.html">View Resources</a></div>
+                <div class="p-3"><a href={{url_for('viewresource')}}>View Resources</a></div>
               </div>
             </div>
           </div>
