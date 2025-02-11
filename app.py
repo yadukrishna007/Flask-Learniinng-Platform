@@ -41,16 +41,25 @@ def home():
 def login():
     username = request.form['username']
     password = request.form['password']
-    cursor.execute('select id, from users where username=%s and password=%s',(username,password))
+
+    cursor.execute('select id,username,password,role from users where username=%s',(username,))
     data = cursor.fetchone()
+
+
     if data:
-        if data[3] == 'admin':
-            return render_template('admin.html')
-        elif data[3] == 'tutor':
-            return render_template('tutor.html')
+        user_id, db_username, db_password, role = data
+
+        if check_password_hash(db_password,password):
+            if role == 'admin':
+                return render_template('admin.html')
+            elif role == 'tutor':
+                return render_template('tutor.html')
+            else:
+                return render_template('student.html')
         else:
-            render_template('student.html')
-        
+            return "password doesnt match!!!"
+            
+            
     else:
         return 'login failed'
     
@@ -145,10 +154,9 @@ def reset_password(token):
         user_id = reset_tokens[token]  # Get user_id from stored token
 
         # 🔹 Update Password in Database
-        cursor.execute("UPDATE users SET password=%s WHERE id=%s", (new_password, user_id))
+        hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256', salt_length=16)
+        cursor.execute("UPDATE users SET password=%s WHERE id=%s", (hashed_password, user_id))
         con.commit()
-        cursor.close()
-        con.close()
 
         del reset_tokens[token]  # Remove token after use
 
@@ -185,7 +193,7 @@ def edituser():
 def edit_user():
     name = request.form['username']
     cursor.execute('select * from users where username=%s',(name,))
-    data = cursor.fetchall()
+    data = cursor.fetchone()
     return render_template('edituser.html',data=data)
 
 @app.route('/update_user',methods=['post'])
@@ -194,7 +202,8 @@ def update_user():
     name = request.form['username']
     password = request.form['password']
     role = request.form['role']
-    cursor.execute('update users set email=%s,password=%s,role=%s where username=%s',(email,password,role,name))
+    hashed_password = generate_password_hash(password,method='pbkdf2:sha256', salt_length=16)
+    cursor.execute('INSERT INTO users (username, email, role, password) VALUES (%s, %s, %s, %s)', (name, email, role, hashed_password))
     con.commit()
     return 'user updated'
 
@@ -206,11 +215,12 @@ def deleteuser():
 def delete_user():
     name = request.form['username']
     cursor.execute('select * from users where username=%s',(name,))   
-    data = cursor.fetchall()
+    data = cursor.fetchone()
     if data:
         return render_template('edituser.html',data=data)
     else:
-        return 'user not found'
+        flash("User not found","danger")
+        return redirect(url_for('deleteuser'))
 
 @app.route('/remove_user',methods=['post'])
 def remove_user():
@@ -243,7 +253,7 @@ def tutor():
     return render_template('tutor.html')
 
 @app.route('/tutor/add_course')
-def add_course():
+def add_course_form():
     return render_template('add_course.html')
 
 @app.route('/add_course', methods=['post'])
@@ -293,7 +303,9 @@ def add_course():
         # 🔹 Handle Resource Based on Type
         file_path = None
 
-        if resource_type == "pdf" and resource_file and allowed_extensions.get(resource_file.filename):
+        file_extension = resource_file.filename.rsplit('.', 1)[-1].lower()
+        if resource_type == "pdf" and resource_file and file_extension in allowed_extensions:
+
             filename = secure_filename(resource_file.filename)
             file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             resource_file.save(file_path)
