@@ -31,7 +31,7 @@
 </head>
 <body>
     <div class="container">
-        <button class="btn btn-danger logout-btn">Logout</button>
+        <button id="lg" class="btn btn-danger logout-btn">Logout</button>
 
         <div class="dashboard-container">
             <h1 class="text-center">Tutor Dashboard</h1>
@@ -73,7 +73,7 @@
                         </div>
                     </div>
             
-                    <button type="button" class="btn btn-success mt-2" id="add-resource">+ Add Resource</button>
+                    <button type="button" class="btn btn-success mt-2" id="add-resource">+ Add more Resource</button>
             
                     <button type="submit" class="btn btn-primary w-100 mt-3">Submit</button>
                 </form>
@@ -82,7 +82,7 @@
             <!-- View Uploaded Resources -->
             <div class="form-section">
                 <h3>Manage Resources</h3>
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered" id="resourceTable">
                     <thead class="table-dark">
                         <tr>
                             <th>Resource ID</th>
@@ -92,29 +92,132 @@
                         </tr>
                     </thead>
                     <tbody>
+                    {% if resources %}
                         <!-- Dynamically populated rows -->
+                        {% for resource in resources %}
                         <tr>
-                            <td>1</td>
-                            <td>Course 1</td>
-                            <td>Example PDF</td>
+                            <td>${resource.id}</td>
+                            <td>${resource.name}</td>
+                            <td>${resource.name}</td>
                             <td>
-                                <button class="btn btn-sm btn-info">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
+                                <button class="btn btn-sm btn-danger delete-btn">Delete</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Course 2</td>
-                            <td>Example Link</td> <!-- Replace with backend fetching data -->
-                            <td>
-                                <button class="btn btn-sm btn-info">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                        </tr>
+                        {% endfor %}
+                    {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+    const resourceContainer = document.getElementById("resource-container");
+    const addResourceBtn = document.getElementById("add-resource");
+    const courseForm = document.querySelector("form"); // Select the form
+
+    function handleResourceTypeChange(event) {
+        const selectedType = event.target.value;
+        const parent = event.target.closest(".resource-group");
+        const fileInput = parent.querySelector(".resource-file");
+        const linkInput = parent.querySelector(".resource-link");
+
+        if (selectedType === "pdf" || selectedType === "book") {
+            fileInput.style.display = "block";
+            fileInput.required = true;
+            linkInput.style.display = "none";
+            linkInput.required = false;
+        } else if (selectedType === "link") {
+            fileInput.style.display = "none";
+            fileInput.required = false;
+            linkInput.style.display = "block";
+            linkInput.required = true;
+        } else {
+            fileInput.style.display = "none";
+            fileInput.required = false;
+            linkInput.style.display = "none";
+            linkInput.required = false;
+        }
+    }
+
+    function addResourceField() {
+        const resourceGroup = document.createElement("div");
+        resourceGroup.classList.add("resource-group", "mb-3");
+        resourceGroup.innerHTML = `
+            <select class="form-select resource-type" name="resourceType[]" required>
+                <option value="">Select resource type</option>
+                <option value="pdf">PDF</option>
+                <option value="link">Link</option>
+                <option value="book">Book</option>
+            </select>
+            <input type="text" class="form-control mt-2" name="resourceName[]" placeholder="Resource Name" required>
+            <input type="file" class="form-control mt-2 resource-file" name="resourceFile[]" accept=".pdf" style="display:none;">
+            <input type="url" class="form-control mt-2 resource-link" name="resourceLink[]" placeholder="Resource Link" style="display:none;">
+            <button type="button" class="btn btn-danger mt-2 remove-resource">Remove</button>
+        `;
+
+        resourceContainer.appendChild(resourceGroup);
+
+        // Attach event listeners to new elements
+        resourceGroup.querySelector(".resource-type").addEventListener("change", handleResourceTypeChange);
+        resourceGroup.querySelector(".remove-resource").addEventListener("click", function () {
+            resourceGroup.remove();
+        });
+    }
+
+    addResourceBtn.addEventListener("click", addResourceField);
+
+    // Ensure existing elements also have event listeners
+    document.querySelectorAll(".resource-type").forEach(select => {
+        select.addEventListener("change", handleResourceTypeChange);
+    });
+
+    document.querySelectorAll(".remove-resource").forEach(button => {
+        button.addEventListener("click", function () {
+            button.closest(".resource-group").remove();
+        });
+    });
+
+    // Handle form submission properly
+    courseForm.addEventListener("submit", function (event) {
+        // Allow the form to be submitted normally to the server
+        console.log("Form submitted to the server");
+    });
+    const table = document.getElementById("resourceTable");
+    table.addEventListener("click", function(event) {
+        if (event.target.classList.contains("delete-btn")) {
+                    const row = event.target.closest("tr");
+                    const resourceId = row.cells[0].innerText; // Get resource ID from the first column
+
+                    if (!confirm("Are you sure you want to delete this resource?")) return;
+
+                    // Send DELETE request to backend
+                    fetch("/delete-resource", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ resource_id: resourceId }),
+                        credentials: "same-origin"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            row.remove(); // Remove row from table
+                            alert("Resource deleted successfully!");
+                        } else {
+                            alert("Error deleting resource: " + data.error);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+    });
+    const logoutBtn = document.getElementById("lg");
+            logoutBtn.addEventListener("click", function(){
+              if(confirm("Do you want to log out??")){
+                window.location.href = "/";
+              }
+            });
+});
+
+    </script>
 </body>
 </html>

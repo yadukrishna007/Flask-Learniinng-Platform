@@ -33,10 +33,8 @@
 </head>
 <body>
     <div class="container dashboard-container">
-        <button class="btn btn-danger logout-btn">Logout</button>
-        <!-- backend fetching -->
+        <button id="lg" class="btn btn-danger logout-btn">Logout</button>
         <h1 class="text-center mb-4">Welcome Student!</h1> 
-        <!-- Tab Navigation -->
         <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active" id="available-courses-tab" data-bs-toggle="tab" data-bs-target="#available-courses" type="button" role="tab" aria-controls="available-courses" aria-selected="true">
@@ -55,81 +53,56 @@
             <!-- Available Courses Section -->
             <div class="tab-pane fade show active" id="available-courses" role="tabpanel" aria-labelledby="available-courses-tab">
                 <h3 class="mb-3">Available Courses</h3>
-                <div class="row">
-                    <!-- Example Course Card -->
-                    <div class="col-md-4">
-                        <div class="card course-card">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Introduction to AI</h5>
-                                <p class="card-text">Learn the fundamentals of Artificial Intelligence, including machine learning and neural networks.</p>
-                                <form action="/enroll" method="post" class="mt-auto">
-                                    <input type="hidden" name="courseId" value="1">
-                                    <button type="submit" class="btn btn-primary w-100">Enroll</button>
-                                </form>
-                            </div>
+                <div class="row" id="available-courses-list">
+                   <!-- dynamic content -->
+                    {% if available_courses %}
+                    {% for course in available_courses %}
+                    <div class="card course-card">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${course.name}</h5>
+                            <p class="card-text">${course.description}</p>
+                            <button class="btn btn-primary w-100 enroll-btn" data-course-id="${course.id}">Enroll</button>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    {% endfor %}
+                    {% else %}
                         <div class="card course-card">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Web Development</h5>
-                                <p class="card-text">Master the art of creating responsive and dynamic websites using HTML, CSS, and JavaScript.</p>
-                                <form action="/enroll" method="post" class="mt-auto">
-                                    <input type="hidden" name="courseId" value="2">
-                                    <button type="submit" class="btn btn-primary w-100">Enroll</button>
-                                </form>
+                                <h5 class="card-title">No courses available</h5>
+                                    <p class="card-text">Please check back later</p>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
 
+            {% if enrolled_courses %}
+            {% for course in enrolled_courses %}
             <!-- Enrolled Courses and Resources Section -->
             <div class="tab-pane fade" id="enrolled-courses" role="tabpanel" aria-labelledby="enrolled-courses-tab">
                 <h3 class="mb-3">My Courses & Resources</h3>
-                <div class="row">
-                    <!-- Example Resource Card -->
-                    <div class="col-md-6">
-                        <div class="card course-card">
-                            <div class="card-body">
-                                <h5 class="card-title">Introduction to AI</h5>
-                                <p class="card-text">Explore the resources for this course:</p>
-                                <!-- Resource Dropdown -->
-                                <div class="dropdown">
-                                    <button class="btn btn-info dropdown-toggle" type="button" id="aiResources" data-bs-toggle="dropdown" aria-expanded="false">
-                                        View Resources
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="aiResources">
-                                        <li><a class="dropdown-item" href="/resources/ai-basics.pdf" target="_blank">AI Basics PDF</a></li>
-                                        <li><a class="dropdown-item" href="/resources/ai-video.mp4" target="_blank">Introduction Video</a></li>
-                                        <li><a class="dropdown-item" href="/resources/ai-extras.zip" target="_blank">Supplementary Materials</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card course-card">
-                            <div class="card-body">
-                                <h5 class="card-title">Web Development</h5>
-                                <p class="card-text">Explore the resources for this course:</p>
-                                <!-- Resource Dropdown -->
-                                <div class="dropdown">
-                                    <button class="btn btn-info dropdown-toggle" type="button" id="webResources" data-bs-toggle="dropdown" aria-expanded="false">
-                                        View Resources
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="webResources">
-                                        <li><a class="dropdown-item" href="/resources/html-guidebook.pdf" target="_blank">HTML Guidebook</a></li>
-                                        <li><a class="dropdown-item" href="/resources/web-tutorial.mp4" target="_blank">CSS Tutorial Video</a></li>
-                                        <li><a class="dropdown-item" href="/resources/web-extras.zip" target="_blank">Supplementary Materials</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+                <div class="row" id="enrolled-courses-list">
+                    <!-- dynamic content -->
+                    <div class="card course-card">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${enrolled_courses.name}</h5>
+                            <p class="card-text">${enrolled_courses.description}</p>
+                            <button class="btn btn-primary w-100 enroll-btn" data-course-id="${course.id}">Enroll</button>
                         </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {  
+            document.addEventListener("DOMContentLoaded", function() {    if (confirm("Do you want to log out?")) {
+            window.location.href = "/";
+            }});
+    });
+
+    </script>
 </body>
 </html>

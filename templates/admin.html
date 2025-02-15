@@ -36,7 +36,17 @@
             </div>
           </div>
           <div class="logout-container">
-            <button type="button" class="btn btn-secondary btn-lg"">Logout</button>
-        </div>        
+            <button id="lg" type="button" class="btn btn-secondary btn-lg"">Logout</button>
+        </div> 
+        <script>
+          document.addEventListener("DOMContentLoaded",function(){
+            const logoutBtn = document.getElementById("lg");
+            logoutBtn.addEventListener("click", function(){
+              if(confirm("Do you want to log out??")){
+                window.location.href = "/";
+              }
+            });
+          });
+        </script>       
     </body>
 </html>

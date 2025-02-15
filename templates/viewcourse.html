@@ -18,16 +18,13 @@
                     <th>Course Description</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Dynamic User Rows -->
-                {% for course in courses %}
+            <tbody id="courseTable">
                 <tr>
-                    <td>{{ course.id }}</td>
-                    <td>{{ course.name }}</td>
-                    <td>{{ course.tutor_id }}</td>
-                    <td>{{ course.description }}</td>
+                    <td>${course.id}</td>
+                    <td>${course.name}</td>
+                    <td>${course.tutor_id}</td>
+                    <td>${course.description}</td>
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div> 
@@ -37,12 +34,12 @@
 
 
 
-<!-- @app.route("/viewcourse")
-def view_courses():
-    # Assuming courses have a 'pdf_url' attribute
-    courses = [
-        {"id": 1, "name": "Web Development", "description": "Learn to build websites", "instructor": "John Doe", "pdf_url": "/static/courses/webdev.pdf"},
-        {"id": 2, "name": "Data Structures", "description": "Learn data structures", "instructor": "Jane Smith", "pdf_url": "/static/courses/datastructures.pdf"},
-        {"id": 3, "name": "Machine Learning", "description": "Learn machine learning", "instructor": "Mark Lee", "pdf_url": "/static/courses/machinelearning.pdf"}
-    ]
-    return render_template("viewcourse.html", courses=courses) -->
+// <!-- @app.route("/viewcourse")
+// def view_courses():
+//     # Assuming courses have a 'pdf_url' attribute
+//     courses = [
+//         {"id": 1, "name": "Web Development", "description": "Learn to build websites", "instructor": "John Doe", "pdf_url": "/static/courses/webdev.pdf"},
+//         {"id": 2, "name": "Data Structures", "description": "Learn data structures", "instructor": "Jane Smith", "pdf_url": "/static/courses/datastructures.pdf"},
+//         {"id": 3, "name": "Machine Learning", "description": "Learn machine learning", "instructor": "Mark Lee", "pdf_url": "/static/courses/machinelearning.pdf"}
+//     ]
+//     return render_template("viewcourse.html", courses=courses) -->

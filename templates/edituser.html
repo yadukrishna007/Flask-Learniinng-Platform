@@ -10,28 +10,109 @@
     </head>
     <body>
         <div class="box">
-            <form action="{{url_for('get_user')}}" method="post">
+            <form action="{{url_for('edit_user')}}" method="post">
                 <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required>
-                <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Get User</button>
+                <input type="text" name="username" id="searchUsername" required>
+                <button id="getUser" type="submit" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Get User</button>
             </form>
             <form action="{{url_for('update_user')}}" method="post">
+                <label for="id">User Id:</label>
+                <input type="text" name="user_id" id="id" required>
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email" required>
                 <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required>
+                <input type="text" name="username" id="editUsername" required>
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" required>
                 <select name="role" id="role" style="margin-top: 10px;">
                     <option value="admin">Admin</option>
-                    <option value="user" selected>Student</option>
+                    <option value="student" selected>Student</option>
                     <option value="tutor">Tutor</option>
                 </select>
-                <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Edit User</button> 
+                <button id="editUser" type="submit" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Edit User</button> 
             </form>
         </div>
         <div class="logout-container">
-            <button type="button" class="btn btn-secondary btn-lg"">Logout</button>
-        </div>        
+            <button id="lg" type="button" class="btn btn-secondary btn-lg"">Logout</button>
+        </div> 
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+            const getUserForm = document.querySelector("form[action='{{url_for('edit_user')}}']");
+            const editUserForm = document.querySelector("form[action='{{url_for('update_user')}}']");
+            const logoutBtn = document.getElementById("lg");
+
+            getUserForm.addEventListener("submit", function(event){
+                event.preventDefault();  // Prevent form submission
+                const username = document.getElementById("searchUsername").value;
+                
+                if(!username){
+                    alert("Please enter a username!");
+                    return;
+                }
+
+                fetch("{{url_for('edit_user')}}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ username })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success){
+                        document.getElementById("id").value = data.id;
+                        document.getElementById("email").value = data.email;
+                        document.getElementById("editUsername").value = data.username;
+                        document.getElementById("role").value = data.role;
+                    } else {
+                        alert("User not found!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+
+            editUserForm.addEventListener("submit", function(event){
+                event.preventDefault();  // Prevent form submission
+                const id = document.getElementById("id").value;
+                const email = document.getElementById("email").value;
+                const username = document.getElementById("editUsername").value;
+                const role = document.getElementById("role").value;
+                const password = document.getElementById("password").value;
+
+                if (!id || !email || !username || !role || !password) {
+                    alert("Please fill all fields!");
+                    return;
+                }
+
+                fetch("{{ url_for('update_user') }}", {
+                    method: "POST",
+                    body: new URLSearchParams({
+                        user_id: document.getElementById("id").value,
+                        email: document.getElementById("email").value,
+                        username: document.getElementById("editUsername").value,
+                        role: document.getElementById("role").value,
+                        password: document.getElementById("password").value
+                    })
+                })
+
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success){
+                        alert("User updated successfully!");
+                    } else {
+                        alert("Error updating user!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+
+            logoutBtn.addEventListener("click", function(){
+                if(confirm("Do you want to log out?")){
+                    window.location.href = "/";
+                }
+            });
+        });
+
+        </script>       
     </body>
 </html>

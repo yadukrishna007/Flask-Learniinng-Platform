@@ -1,13 +1,14 @@
-from flask import Flask,render_template,request,flash,redirect,url_for
+from flask import Flask,render_template,request,flash,redirect,url_for,jsonify,session
 import pymysql
 import os
 import secrets
 import smtplib
 from email.mime.text import MIMEText
 from werkzeug.utils import secure_filename
-from werkzeug.security import check_password_hash,generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 def get_connection():
     return pymysql.connect(host='localhost',
                            user='root',
@@ -37,31 +38,33 @@ allowed_extensions = {'pdf','doc','docx','txt'}
 def home():
     return render_template('login.html')
 
-@app.route('/login',methods=['post'])
+@app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
 
-    cursor.execute('select id,username,password,role from users where username=%s',(username,))
+    print(f"Received login request - Username: {username}, Password: {password}")
+    if not username or not password:
+        return jsonify({"success": False, "message": "Please enter username and password!"})
+    
+    cursor.execute('SELECT id, username, password, role FROM users WHERE username=%s', (username,))
     data = cursor.fetchone()
 
+    print(f"Database query result: {data}")
 
     if data:
         user_id, db_username, db_password, role = data
 
-        if check_password_hash(db_password,password):
-            if role == 'admin':
-                return render_template('admin.html')
-            elif role == 'tutor':
-                return render_template('tutor.html')
-            else:
-                return render_template('student.html')
+        if check_password_hash(db_password, password):
+            session['user_id'] = user_id
+            session['username'] = db_username
+            session['role'] = role
+            return jsonify({"success": True, "role": role, "redirect": url_for(f'{role}', user_id=user_id)})
         else:
-            return "password doesnt match!!!"
+            return jsonify({"success": False, "message": "Invalid password!"})
             
-            
-    else:
-        return 'login failed'
+    return jsonify({"success": False, "message": "User not found!"})
+
     
 @app.route('/signup')
 def signup():
@@ -80,12 +83,10 @@ def sign_up():
             (name, email, 'student', hashedPassword)
         )
         con.commit()
-        flash("Account created successfully! Please log in.", "success")
-        return redirect(url_for('login'))
+        return jsonify({"success": True, "message": "Account created successfully! Please log in."})  
     except pymysql.MySQLError as e:
         con.rollback()
-        flash(f"Error: {e}", "danger")
-        return render_template('login.html')
+        return jsonify({"success": False, "message": f"Error: {str(e)}"})
 
 
 @app.route('/forgot_password', methods=['POST'])
@@ -167,8 +168,8 @@ def reset_password(token):
 
 
 # adim and its functionalities
-@app.route('/admin_page')
-def admin():
+@app.route('/admin_page/<int:user_id>')
+def admin(user_id):
     return render_template('admin.html')
 
 @app.route('/admin_page/adduser')
@@ -181,81 +182,134 @@ def add_user():
     username = request.form['username']
     password = request.form['password']
     role = request.form['role']
-    cursor.execute('insert into users(username,email,role,password) values(%s,%s,%s,%s)',(username,email,role,password))
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+    cursor.execute('insert into users(username,email,role,password) values(%s,%s,%s,%s)',(username,email,role,hashed_password))
     con.commit()
-    return 'user added'
+    return jsonify({"success":True, "message":"user added successfully!"} )
 
 @app.route('/admin_page/edituser')
 def edituser():
     return render_template('edituser.html')
 
-@app.route('/get_user',methods=['post'])
+@app.route('/edit_user',methods=['post'])
 def edit_user():
+    print(request.form)
     name = request.form['username']
-    cursor.execute('select * from users where username=%s',(name,))
+    cursor.execute('select id, username,email,role from users where username=%s',(name,))
     data = cursor.fetchone()
-    return render_template('edituser.html',data=data)
-
+    if data:
+        return jsonify({"success":True, "id":data[0], "username":data[1],"email":data[2], "role":data[3] }),200
 @app.route('/update_user',methods=['post'])
 def update_user():
-    email = request.form['email']
-    name = request.form['username']
-    password = request.form['password']
-    role = request.form['role']
-    hashed_password = generate_password_hash(password,method='pbkdf2:sha256', salt_length=16)
-    cursor.execute('INSERT INTO users (username, email, role, password) VALUES (%s, %s, %s, %s)', (name, email, role, hashed_password))
-    con.commit()
-    return 'user updated'
+    try:
+        id = request.form.get('user_id')
 
-@app.route('/admin_page/deleteuser')
+        email = request.form.get('email')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = request.form.get('role')
+
+        if not email or not username or not password or not role:
+            return jsonify({"success": False, "error": "All fields are required!"}), 400
+
+        # Hash the password
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+        print("Hashed Password:", hashed_password)  # Debugging
+
+        # Check if the user exists
+        cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"success": False, "error": "User not found!"}), 404
+
+        print("Received role:", role)  # Debugging
+
+        # Update user
+        cursor.execute("UPDATE users SET username=%s,email=%s, role=%s, password=%s WHERE id=%s",
+                       (username, email, role, hashed_password, id))
+        con.commit()  # Ensure the update is saved
+
+        return jsonify({"success": True, "message": "User updated successfully!"}), 200
+
+    except Exception as e:
+        print("Error:", str(e))  # Debugging
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@app.route('/deleteuser')    
 def deleteuser():
     return render_template('deleteuser.html')
 
-@app.route('/delete_user',methods=['post'])
+@app.route('/delete_user', methods=['POST'])
 def delete_user():
-    name = request.form['username']
-    cursor.execute('select * from users where username=%s',(name,))   
+    username = request.form.get('username')  # Use .get() for safety
+    print(f"Searching for username: {username}")  # Debugging log
+    
+    cursor.execute('SELECT id FROM users WHERE username=%s', (username,))
     data = cursor.fetchone()
+    
     if data:
-        return render_template('edituser.html',data=data)
+        print(f"User found! ID: {data[0]}")  # Debugging log
+        return jsonify({"success": True, "user_id": data[0]}), 200
     else:
-        flash("User not found","danger")
-        return redirect(url_for('deleteuser'))
+        print("User not found!")  # Debugging log
+        return jsonify({"success": False, "message": "User not found!"}), 200  # Explicit status
 
 @app.route('/remove_user',methods=['post'])
 def remove_user():
-    id = request.form['user_id']
+    id = request.form.get('user_id')
     cursor.execute('delete from users where id=%s',(id,))
     con.commit()
-    return 'user deleted'
+    return jsonify({"success":True, "message":"user removed successfully!"}),200
 
 @app.route('/admin_page/viewuser')
 def viewuser():
     cursor.execute('select * from users')
     data = cursor.fetchall()
-    return render_template('viewuser.html',data=data)
 
+    users_data = [{"id": user[0], "name": user[1], "email": user[2], "role": user[3]} for user in data]
+
+    return render_template('viewuser.html', users=users_data)
 @app.route('/admin_page/viewcourse')
 def viewcourse():
     cursor.execute('select * from courses')
     data = cursor.fetchall()
-    return render_template('viewcourse.html',data=data)
+    courseList = [{"id": course[0], "name": course[1], "description": course[2]} for course in data]
+    return render_template('viewcourse.html', courses=courseList)
 
 @app.route('/admin_page/viewresource')
 def viewresource():
     cursor.execute('select * from resources')
     data = cursor.fetchall()
-    return render_template('viewresource.html',data=data)
+    resourceList = [{"id": resource[0], "course": resource[1], "name": resource[2], "path": resource[3], "type": resource[4]}for resource in data]
+    return render_template('viewresource.html', resources=resourceList)
 
 # tutor and its functionalities
-@app.route('/tutor')
-def tutor():
-    return render_template('tutor.html')
+@app.route('/tutor/<int:user_id>')
+def tutor(user_id):
+    cursor.execute("SELECT id, name FROM courses WHERE tutor_id=%s", (user_id,))
+    courses = cursor.fetchall()
+
+    courses_data = []
+    for course in courses:
+        course_id, course_name = course
+        cursor.execute("SELECT id, name, file_url FROM resources WHERE course_id=%s", (course_id,))
+        resources = cursor.fetchall()
+
+        courses_data.append({
+            "id": course_id,
+            "name": course_name,
+            "resources": [{"id": r[0], "name": r[1], "path": r[2]} for r in resources]
+        })
+
+    return render_template('tutor.html', courses=courses_data, user_id=user_id)
 
 @app.route('/tutor/add_course')
 def add_course_form():
-    return render_template('add_course.html')
-
+    cursor.execute("select r.id, c.name, r.name from resources r join courses c on r.course_id = c.id where c.tutor_id = %s", (session['user_id'],))
+    resources = cursor.fetchall()
+    return render_template('add_course.html', resources=resources)
+    
 @app.route('/add_course', methods=['post'])
 def add_course():
     try:
@@ -333,11 +387,57 @@ def add_course():
     return redirect(url_for("admin_page"))
 
 
-# student and its functionalities
-@app.route('/student')
-def student():
-    return render_template('student.html')
+#delete course using button
+@app.route('/delete-resource', methods=['POST'])
+def delete_resource():
+    data = request.get_json()
+    resource_id = data.get('resource_id')
 
+    if not resource_id:
+        return jsonify({'error': 'Resource ID is required'}), 400
+
+    try:
+        with con.cursor() as cursor:
+            sql = "DELETE FROM resources WHERE id = %s"
+            cursor.execute(sql, (resource_id,))
+    finally:
+        con.close()
+
+    return jsonify({'success': True, 'message': 'Resource deleted successfully'})
+
+
+
+# student and its functionalities
+@app.route('/student/<int:user_id>')
+def student(user_id):
+    cursor.execute('select c.name, c.description from courses c join enrollments e on c.id = e.course_id where e.user_id = %s', (user_id,))
+    data = cursor.fetchall()
+
+    cursor.execute('SELECT c.id, c.course_name FROM enrollments e JOIN courses c ON e.course_id = c.id  WHERE e.student_id = %s', (user_id,))
+    data1 = cursor.fetchall()
+
+    return render_template('student.html', available_courses=data, enrolled_courses=data1, user_id=user_id)
+
+@app.route('/enroll', methods=['POST'])
+def enroll():
+    student_id = request.json.get('student_id')  # Get student ID from frontend
+    course_id = request.json.get('course_id')  # Get course ID from frontend
+
+    if not student_id or not course_id:
+        return jsonify({"error": "Missing student_id or course_id"}), 400
+
+    # Check if the student is already enrolled
+    cursor.execute("SELECT * FROM enrollments WHERE student_id = %s AND course_id = %s", (student_id, course_id))
+    existing = cursor.fetchone()
+
+    if existing:
+        return jsonify({"message": "Already enrolled"}), 409  # Conflict response
+
+    # Insert into enrollments table
+    cursor.execute("INSERT INTO enrollments (student_id, course_id) VALUES (%s, %s)", (student_id, course_id))
+    con.commit()
+    
+    return jsonify({"message": "Enrolled successfully"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

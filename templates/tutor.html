@@ -33,78 +33,53 @@
 </head>
 <body>
     <div class="container dashboard-container">
-        <button class="btn btn-danger logout-btn">Logout</button>
+        <button id="lg" class="btn btn-danger logout-btn">Logout</button>
         <h1 class="text-center mb-4">Welcome!</h1> 
         
         <!-- Add Course Button -->
         <div class="d-flex justify-content-between mb-3">
             <h3>My Courses & Resources</h3>
-            <a href={{ url_for('add_course') }} class="btn btn-success">+ Add Course</a>
+            <a href={{ url_for('add_course_form') }} class="btn btn-success">+ Add Course</a>
         </div>
-
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" id="enrolled-courses-tab" data-bs-toggle="tab" 
-                        data-bs-target="#enrolled-courses" type="button" role="tab" 
-                        aria-controls="enrolled-courses" aria-selected="true">
-                    Added Courses & Resources
-                </button>
-            </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <!-- Added Courses and Resources Section -->
-            <div class="tab-pane fade show active" id="enrolled-courses" role="tabpanel" 
-                 aria-labelledby="enrolled-courses-tab">
-                <div class="row">
-                    <!-- Example Resource Card -->
+            <div class="row">
+                {% for course in courses %}
                     <div class="col-md-6">
-                        <div class="card course-card">
+                        <div class="card course-card mb-4">
                             <div class="card-body">
-                                <h5 class="card-title">Introduction to AI</h5>
-                                <p class="card-text">Explore the resources for this course:</p>
-                                <!-- Resource Dropdown -->
+                                <h5 class="card-title mb-3">{{ course.title }}</h5>
+                                <p class="card-text">{{ course.description }}</p>
+
                                 <div class="dropdown">
-                                    <button class="btn btn-info dropdown-toggle" type="button" 
-                                            id="aiResources" data-bs-toggle="dropdown" 
-                                            aria-expanded="false">
-                                        View Resources
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="aiResources">
-                                        <li><a class="dropdown-item" href="/resources/ai-basics.pdf" target="_blank">AI Basics PDF</a></li>
-                                        <li><a class="dropdown-item" href="/resources/ai-video.mp4" target="_blank">Introduction Video</a></li>
-                                        <li><a class="dropdown-item" href="/resources/ai-extras.zip" target="_blank">Supplementary Materials</a></li>
-                                    </ul>
+                                    <button class="btn btn-info dropdown-toggle" type="button" id="resources-{{ course.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Resources
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="resources-{{ course.id }}">
+                                            {% for resource in course.resources %}
+                                                <li><a class="dropdown-item" href="{{ resource.link }}">{{ resource.title }}</a></li>
+                                            {% endfor %}
+                                        </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card course-card">
-                            <div class="card-body">
-                                <h5 class="card-title">Web Development</h5>
-                                <p class="card-text">Explore the resources for this course:</p>
-                                <!-- Resource Dropdown -->
-                                <div class="dropdown">
-                                    <button class="btn btn-info dropdown-toggle" type="button" 
-                                            id="webResources" data-bs-toggle="dropdown" 
-                                            aria-expanded="false">
-                                        View Resources
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="webResources">
-                                        <li><a class="dropdown-item" href="/resources/html-guidebook.pdf" target="_blank">HTML Guidebook</a></li>
-                                        <li><a class="dropdown-item" href="/resources/web-tutorial.mp4" target="_blank">CSS Tutorial Video</a></li>
-                                        <li><a class="dropdown-item" href="/resources/web-extras.zip" target="_blank">Supplementary Materials</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- End Row -->
-            </div> <!-- End Tab Pane -->
-        </div> <!-- End Tab Content -->
-    </div>
+                {% endfor %}
+
+            </div>
+            </div>
+            </body>
+    <script>
+        document.addEventListener("DOMContentLoaded",function(){
+
+
+
+
+            const logoutBtn = document.getElementById("lg");
+            logoutBtn.addEventListener("click", function(){
+              if(confirm("Do you want to log out??")){
+                window.location.href = "/";
+              }
+            });
+        });
+    </script>
 </body>
 </html>

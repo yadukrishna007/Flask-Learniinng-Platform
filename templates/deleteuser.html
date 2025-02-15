@@ -12,17 +12,74 @@
         <div class="box">
             <form action="{{url_for('delete_user')}}" method="post">
                 <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required>
-                <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Get User</button>
+                <input type="text" name="username" id="delete_username" required>
+                <button id="getUser" type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Get User</button>
             </form>
             <form action="{{url_for('remove_user')}}" method="post">
                 <label for="user_id">User_id:</label>
                 <input type="number" name="user_id" id="user_id" required>
-                <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Delete User</button> 
+                <button id="deleteUserBtn" type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Delete User</button> 
             </form>
         </div>
         <div class="logout-container">
-            <button type="button" class="btn btn-secondary btn-lg"">Logout</button>
-        </div>        
+            <button id="lg" type="button" class="btn btn-secondary btn-lg"">Logout</button>
+        </div>   
+        <script>
+            document.addEventListener("DOMContentLoaded",function(){
+                const getUserBtn = document.getElementById("getUser");
+                const deleteUserBtn = document.getElementById("deleteUserBtn");
+                const logoutBtn = document.getElementById("lg");
+
+                getUserBtn.addEventListener("click", function(event){
+                    event.preventDefault();
+                    const username = document.getElementById("delete_username").value;
+                   
+                    if(username === ""){
+                        alert("Please enter a username!!");
+                        return;
+                    }
+                    fetch("{{url_for('delete_user')}}",{
+                        method : "POST",
+                        headers : {
+                            "Content-Type" : "application/x-www-form-urlencoded"
+                        },
+                        body : new URLSearchParams({ username : username})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success){
+                            document.getElementById("user_id").value = data.user_id;  // Set the user_id value
+                        }
+                        else{
+                            alert("User not found!!");
+                        }
+                    })
+                });
+                deleteUserBtn.addEventListener("click", function(event){
+                    event.preventDefault();
+                    const user_id = document.getElementById("user_id").value;
+                    if(user_id === ""){
+                        alert("Please enter a user_id!!");
+                        return;
+                    }
+                    fetch("{{url_for('remove_user')}}",{
+                        method : "POST",
+                        headers : {
+                            "content-Type" : "application/x-www-form-urlencoded"
+                        },
+                        body : new URLSearchParams({ user_id : user_id})
+                    })
+                    .then(response => response.text())
+                    .then( data => data.success ? alert("User deleted successfully!!") : alert("Error deleting user!!"))
+                });
+
+
+                logoutBtn.addEventListener("click", function(){
+                    if(confirm("Do you want to log out??")){
+                        window.location.href = "/";
+                    }
+                });
+            });
+        </script>     
     </body>
 </html>

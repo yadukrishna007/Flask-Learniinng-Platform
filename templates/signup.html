@@ -11,7 +11,7 @@
     <body>
         <div class="box">
             <h1>Signup</h1>
-            <form action="{{url_for('sign_up')}}" method="post">
+            <form class="form" action="{{url_for('sign_up')}}" method="post">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required>
                 <label for="email">Email:</label>
@@ -22,9 +22,49 @@
                 <input type="password" name="cpassword" id="cpassword" required>
                 <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Login</button>     
                 <div style="text-align: center;">
-                    <a href={{ url_for('login')}} style="text-decoration: none;">Already have an account?</a>
+                    <a href={{ url_for('home')}} style="text-decoration: none;">Already have an account?</a>
                 </div>
             </form>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded",function(){
+                const signupBtn = document.querySelector("button");
+                signupBtn.addEventListener("click",function(event){
+                    event.preventDefault();
+                    let username = document.getElementById("username").value.trim();
+                    let email = document.getElementById("email").value.trim();
+                    let password = document.getElementById("password").value;
+                    let cpassword = document.getElementById("cpassword").value;
+                    if(password !== cpassword){
+                        alert("Passwords do not match");
+                        return;
+                    }
+
+                    let formData = new URLSearchParams();
+                    formData.append("username", username);
+                    formData.append("email", email);
+                    formData.append("password", password);
+
+                    fetch("/sign_up",{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: formData
+                    }
+                    )
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success){
+                            alert("Signup successful");
+                            window.location.href = "/";
+                        }
+                        else{
+                            alert("Error signing up");
+                        }
+                    })
+                });    
+            });
+        </script>
     </body>
 </html>

@@ -11,17 +11,49 @@
     <body>
         <div class="box">
             <h1>Login</h1>
-            <form action="{{url_for('login')}}" method="post">
+            <form id="login-form"action="{{url_for('login')}}" method="post">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required>
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" required>
-                <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Login</button>     
+                <button id="login" type="submit" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Login</button>     
                 <div style="display: flex; justify-content: space-between;">
                     <a href={{ url_for('signup')}} style="text-align: center; display: inline-block; text-decoration: none;">Don't have an account?</a>
-                    <a href={{ url_for('forgot')}} style="text-align: center; display: inline-block; text-decoration: none;">forgot password?</a>
+                    <a href={{ url_for('forgot_password')}} style="text-align: center; display: inline-block; text-decoration: none;">forgot password?</a>
                 </div>
             </form> 
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded",function(){
+                const formData = document.getElementById("login-form");
+
+                formData.addEventListener("submit",function(event){
+                    const username = document.getElementById("username").value;
+                    const password = document.getElementById("password").value;
+                    if(!username || !password){
+                        alert("Please enter username and password!!");
+                        return;
+                    }
+                    let formData = new URLSearchParams();
+                    formData.append("username", username);
+                    formData.append("password", password);
+
+                    fetch("/login",{
+                        method : "POST",
+                        headers : { "Content-Type" : "application/x-www-form-urlencoded"},
+                        body : formData
+                    })
+                    .then(response => response.json())
+                  .then(data => { 
+                    if (data.success) {
+                        window.location.href = data.redirect; // ✅ Redirect to the correct page
+                    } else {
+                        alert(data.message); // ✅ Show error message from Flask
+                    }
+                 }
+                ) 
+                });
+            });
+        </script>
     </body>
 </html>

@@ -15,21 +15,18 @@
                     <th>Resource ID</th>
                     <th>Course ID</th>
                     <th>Resource Name</th>
-                    <th>Course Material</th>
+                    <th>Resource Path</th>
+                    <th>Resource Type</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Dynamic User Rows -->
-                {% for resource in resources %}
+            <tbody id="resourceTable">
                 <tr>
-                    <td>{{ resource.id }}</td>
-                    <td>{{ resource.c_id }}</td>
-                    <td>{{ resource.name }}</td>
-                    <td>
-                        <a href="{{ course.pdf_url }}" class="btn btn-info btn-sm" target="_blank">Download PDF</a>
-                    </td>
+                    <td>${resource.id}</td>
+                    <td>${resource.course}</td>
+                    <td>${resource.name}</td>
+                    <td>${resource.path}</td>
+                    <td>${resource.type}</td>
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div> 

@@ -16,23 +16,27 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Password</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Dynamic User Rows -->
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.role }}</td>
-                    <td>{{ user.password }}</td>
-                </tr>
-                {% endfor %}
+            <tbody id="userTable">
+                {% if users %}
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No users found</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
+    
 </body>
 </html>
 

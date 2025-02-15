@@ -11,7 +11,7 @@
     <body>
         <div class="box">
             
-        <form action="{{url_for('add_user')}}" method="post">
+        <form id="myForm" action="{{url_for('add_user')}}" method="post">
             <label for="email">Email:</label>
             <input type="email" name="email" id="email" required>
             <label for="username">Username:</label>
@@ -23,11 +23,48 @@
                 <option value="user" selected>Student</option>
                 <option value="tutor">Tutor</option>
             </select>
-            <button type="button" class="btn btn-success" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Add User</button> 
+            <button type="button" class="btn btn-success submit" style="margin-top:19px ; width: 100%; margin-bottom: 15px;">Add User</button> 
         </form>
         </div>
         <div class="logout-container">
-            <button type="button" class="btn btn-secondary btn-lg"">Logout</button>
-        </div>        
+            <button type="button" id="lg" class="btn btn-secondary btn-lg"">Logout</button>
+        </div>   
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById("myForm");
+                const submitButton = document.querySelector(".submit");
+                submitButton.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    submitButton.disabled = true;
+
+                    fetch(form.action, {
+                        method: form.method,
+                        body: new FormData(form),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("user added successfully!");
+                        }
+                        else{
+                            alert("Error adding user!!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error ",error);
+                        alert("an error occured!!")
+                    })
+                    .finally(() =>{
+                        submitButton.disabled = false;
+                    });
+                });
+                const logoutBtn = document.getElementById("lg");
+                logoutBtn.addEventListener("click", function(){
+                    if(confirm("Do you want to log out??")){
+                        window.location.href = "/";
+                    }
+                });
+            });
+        </script>     
     </body>
 </html>
